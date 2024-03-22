@@ -1,11 +1,15 @@
 const int TRIG_PIN1 = 2;
 const int ECHO_PIN1 = 3;
-const int TRIG_PIN2 = 6; // New trigger pin for the second sensor
-const int ECHO_PIN2 = 7; // New echo pin for the second sensor
+const int TRIG_PIN2 = 6;
+const int ECHO_PIN2 = 7;
 const int RELAY_PIN = 5;
 
-unsigned long lightOffStartTime = 0; // Tracks when both sensors exceed their distance threshold
-const long lightOffDelay = 3000; // 3 seconds delay
+unsigned long previousTime = 0;
+const long interval = 250; // 0.52 seconds
+long previousDistance1 = 0, previousDistance2 = 0;
+const long distanceChangeThreshold = 10; // Change threshold in cm
+unsigned long lightOffStartTime = 0;
+const long lightOffDelay = 5000; // 5 seconds delay
 bool lightOn = false;
 
 void setup() {
@@ -19,44 +23,41 @@ void setup() {
   Serial.begin(9600);
 }
 
+long measureDistance(int triggerPin, int echoPin) {
+  digitalWrite(triggerPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(triggerPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(triggerPin, LOW);
+  long duration = pulseIn(echoPin, HIGH);
+  return duration * 0.034 / 2;
+}
+
 void loop() {
-  long duration1, distance1, duration2, distance2;
+  unsigned long currentTime = millis();
 
-  // First sensor measurement
-  digitalWrite(TRIG_PIN1, LOW);
-  delayMicroseconds(2);
-  digitalWrite(TRIG_PIN1, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(TRIG_PIN1, LOW);
-  duration1 = pulseIn(ECHO_PIN1, HIGH);
-  distance1 = duration1 * 0.034 / 2;
+  if (currentTime - previousTime >= interval) {
+    long distance1 = measureDistance(TRIG_PIN1, ECHO_PIN1);
+    long distance2 = measureDistance(TRIG_PIN2, ECHO_PIN2);
+    
+    Serial.print("Bottom Distance: ");
+    Serial.print(distance1);
+    Serial.println(" cm");
+    Serial.print("Top Distance: ");
+    Serial.print(distance2);
+    Serial.println(" cm");
 
-  // Second sensor measurement
-  digitalWrite(TRIG_PIN2, LOW);
-  delayMicroseconds(2);
-  digitalWrite(TRIG_PIN2, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(TRIG_PIN2, LOW);
-  duration2 = pulseIn(ECHO_PIN2, HIGH);
-  distance2 = duration2 * 0.034 / 2;
+    if (abs(distance1 - previousDistance1) > distanceChangeThreshold || abs(distance2 - previousDistance2) > distanceChangeThreshold) {
+      digitalWrite(RELAY_PIN, HIGH); // Turn on the light
+      lightOn = true;
+      lightOffStartTime = millis();
+    } else if (lightOn && currentTime - lightOffStartTime >= lightOffDelay) {
+      digitalWrite(RELAY_PIN, LOW); // Turn off the light after 3 seconds
+      lightOn = false;
+    }
 
-  // Debugging output
-  Serial.print("Distance 1: ");
-  Serial.print(distance1);
-  Serial.println(" cm");
-  Serial.print("Distance 2: ");
-  Serial.print(distance2);
-  Serial.println(" cm");
-
-  // Light control logic
-  if (distance1 < 100 || distance2 < 50) {
-    digitalWrite(RELAY_PIN, HIGH); // Turn on the light
-    lightOn = true;
-    lightOffStartTime = millis(); // Reset the timer whenever the light is turned on
-  } else if (lightOn && millis() - lightOffStartTime >= lightOffDelay) {
-    digitalWrite(RELAY_PIN, LOW); // Turn off the light after 3 seconds
-    lightOn = false;
+    previousDistance1 = distance1;
+    previousDistance2 = distance2;
+    previousTime = currentTime;
   }
-
-  delay(100); // Short delay to prevent too rapid triggering
 }
