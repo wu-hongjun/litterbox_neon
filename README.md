@@ -12,7 +12,8 @@
 * 2x [HC-SR04 Distance Sensor](https://www.amazon.com/WWZMDiB-HC-SR04-Ultrasonic-Distance-Measuring/dp/B0B1MJJLJP/)
 * 1x [5V Module 1 Channel Relay Switch](https://www.amazon.com/dp/B0B4JSH9HB?psc=1&ref=ppx_yo2ov_dt_b_product_details)
 * 1x [LED Neon Sign](https://www.amazon.com/AIR-LED-Connected-Decorative-Decoration/dp/B098D9S5RQ/) (Or whatever you want to turn on/off)
-* 1x [USB 2.0 Hub](https://www.amazon.com/Anker-Transfer-Extended-Charging-Supported/dp/B0CCDZWH5H/) 
+* 1x [USB 2.0 Hub](https://www.amazon.com/Anker-Transfer-Extended-Charging-Supported/dp/B0CCDZWH5H/)
+* 1x [Breadboard](https://www.amazon.com/DEYUE-breadboard-Set-Prototype-Board/dp/B07LFD4LT6/)
 
 # Software Needed
 * [Arduino IDE](https://www.arduino.cc/en/software)
