@@ -15,7 +15,7 @@
 * 1x [USB 2.0 Hub](https://www.amazon.com/Anker-Transfer-Extended-Charging-Supported/dp/B0CCDZWH5H/) 
 
 # Software Needed
-* Arduino IDE
+* [Arduino IDE](https://www.arduino.cc/en/software)
 
 # How To
 ## Hardware
